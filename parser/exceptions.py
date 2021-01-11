@@ -1,0 +1,4 @@
+class LoadPageException(Exception):
+    pass
+
+

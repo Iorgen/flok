@@ -1,0 +1,10 @@
+.idea
+*venv
+__pycache__
+*.pyc
+*.override.*
+local_settings.py
+*.sqlite3
+*.db
+static
+output.txt
