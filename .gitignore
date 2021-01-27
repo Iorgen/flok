@@ -8,3 +8,8 @@ local_settings.py
 *.db
 static
 output.txt
+data
+venv
+.DS_Store
+find_org_collection_links
+find_org_company_information.csv
