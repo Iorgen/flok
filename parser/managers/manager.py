@@ -61,7 +61,6 @@ class ParserManager:
         # Load the queue from urls list
         for linkname in self.parse_urls:
             queue.put(linkname)
-
         # Wait for the queue to finish
         queue.join()
         # for _parser in self.PARSERS:

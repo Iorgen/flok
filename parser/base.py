@@ -84,6 +84,7 @@ class BaseChromeDriverParser(BaseParser):
         _chrome_options = self._initialize_driver_options()
         self._initialize_driver(_driver_path=driver_path, _chrome_options=_chrome_options)
         super(BaseChromeDriverParser, self).__init__(*args, **kwargs)
+        self._change_proxy("37.9.46.222:8085")
 
     @staticmethod
     def _initialize_driver_options():

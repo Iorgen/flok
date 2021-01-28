@@ -21,6 +21,12 @@ class BaseFindOrgParser(BaseChromeDriverParser):
         collection of given pages.
         - for given pages load on every url using generator function
         """
+    CAPTCHA_USAGE = 0
+
+    @classmethod
+    def captcha_capacity(cls):
+        print(cls.CAPTCHA_USAGE)
+
     def load_page(self):
         raise NotImplementedError()
 
@@ -50,10 +56,11 @@ class BaseFindOrgParser(BaseChromeDriverParser):
             self._DRIVER.get(f"{self.BASE_URL}{self.CAPTCHA_ENDPOINT}")
             base64_captcha_image = self._try_to_find_captcha_block()
             if base64_captcha_image is not None:
-
                 captcha_key = self._cap_monster_solver(image_base64=base64_captcha_image)
                 if captcha_key is not None:
                     self._insert_captcha_and_submit_page(_captcha_key=captcha_key)
+                    BaseFindOrgParser.CAPTCHA_USAGE = BaseFindOrgParser.CAPTCHA_USAGE + 1
+                    self.LOGGER.info(f"Solved {BaseFindOrgParser.CAPTCHA_USAGE} captchas")
                     # Save img with captcha answer name to data folder in debug mode
                     # image = base64.b64decode(str(base64_captcha_image))
                     # with open("data/imageToSave.png", "wb") as fh:
@@ -102,6 +109,7 @@ class BaseFindOrgParser(BaseChromeDriverParser):
         captcha_input.submit()
         # /html/body/div[1]/div[2]/div[1]/form[1]/input[@name='keystring'] XPATH for input
         # /html/body/div[1]/div[2]/div[1]/form[1]/input[@type='submit'] - for submit
+
 
 class FindOrgRetrieveCompanyUrlsByOkvedPageChromeParser(BaseFindOrgParser):
     """
@@ -164,6 +172,7 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
     - коды ОКВЕД -
 
     """
+
     @staticmethod
     def remove_prefix(s, prefix):
         return s[len(prefix):] if s.startswith(prefix) else s
