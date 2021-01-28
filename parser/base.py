@@ -126,7 +126,7 @@ class BaseChromeDriverParser(BaseParser):
                 method='POST',
                 url='https://api.capmonster.cloud/getTaskResult',
                 json={
-                    "clientKey": "",
+                    "clientKey": "91588f4fb9475bde03fdfee20cd709ed",
                     "taskId": task_id
                 },
             ).json()
@@ -146,7 +146,7 @@ class BaseChromeDriverParser(BaseParser):
             method='POST',
             url='https://api.capmonster.cloud/createTask',
             json={
-                "clientKey": "",
+                "clientKey": "91588f4fb9475bde03fdfee20cd709ed",
                 "task":
                     {
                         "type": "ImageToTextTask",
