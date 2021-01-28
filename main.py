@@ -1,5 +1,4 @@
 # Read csv with inn, kpp, ogrn
-# This can help
 # https://pastebin.com/QrZG9e9T
 # https://pymotw.com/2/multiprocessing/basics.html
 # https://medium.com/analytics-vidhya/asyncio-threading-and-multiprocessing-in-python-4f5ff6ca75e8
@@ -27,16 +26,16 @@ def main():
         parse_urls.append(f'okved2/49.4/page/{i}')
 
     # Collections
-    # download_manager = ParserManager(
-    #     parse_urls=parse_urls,
-    #     output_file_path='dummy_path',
-    #     thread_count=6
-    # )
-    #
-    # download_manager.begin_downloads(
-    #     _type='collection',
-    #     _source='find_org'
-    # )
+    download_manager = ParserManager(
+        parse_urls=parse_urls,
+        output_file_path='dummy_path',
+        thread_count=6
+    )
+
+    download_manager.begin_downloads(
+        _type='collection',
+        _source='find_org'
+    )
     with open('find_org_collection_links', 'r') as file:
         pages_urls = file.readlines()
     pages_urls = [x.strip() for x in pages_urls]
@@ -49,7 +48,7 @@ def main():
     #     writer.writerow({'first_name': 'Baked', 'last_name': 'Beans'})
     # Pages
 
-    # manager;phones;phones_government_buy;status;INN;main_okved_codes;additional_okved_codes
+    # manager;phones;phones_government_buy;status;INN
 
     d_m = ParserManager(
         parse_urls=pages_urls,

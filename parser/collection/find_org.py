@@ -179,15 +179,10 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
             'phones_government_buy': '',
             'status': '',
             'INN': '',
-            'main_okved_codes': [],
-            'additional_okved_codes': []
+            # 'main_okved_codes': [],
+            # 'additional_okved_codes': []
         }
         try:
-            # Get company manager personal information
-            result['manager'] = self._DRIVER.find_element_by_xpath(
-                xpath=u"//i[contains(text(), 'Руководитель')]/following-sibling::a"
-            ).text
-
             # GET Company status
             result['status'] = self._DRIVER.find_element_by_xpath(
                 xpath=u"//i[contains(text(), 'Статус')]/following-sibling::span"
@@ -197,17 +192,21 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
             result['INN'] = self._DRIVER.find_element_by_xpath(
                 xpath=u"//i[contains(text(), 'ИНН')]/following-sibling::a"
             ).text
-
+            try:
+                # Get company manager personal information
+                result['manager'] = self._DRIVER.find_element_by_xpath(
+                    xpath=u"//i[contains(text(), 'Руководитель')]/following-sibling::a"
+                ).text
+            except Exception as E:
+                self.LOGGER.warning(f"manager name does not exists")
 
             try:
-
                 # Get Company phones by gov
                 result['phones_government_buy'] = self._DRIVER.find_element_by_xpath(
                     xpath=u"//i[contains(text(),'Телефон(ы) по данным госзакупок:')]/ancestor::p").text
-                # TODO cut by Телефон(ы) по данным госзакупок:
                 result['phones_government_buy'] = self.remove_prefix(result['phones_government_buy'], 'Телефон(ы) по данным госзакупок:')
             except Exception as E:
-                self.LOGGER.warning(f"Page does not contain goverment phone numbers")
+                self.LOGGER.warning(f"GOVERNMENT phone numbers does not exists")
                 pass
 
             try:
@@ -215,11 +214,10 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
                 result['phones'] = self._DRIVER.find_element_by_xpath(
                     xpath=u"//i[contains(text(), 'Телефон(ы):')]/ancestor::p"
                 ).text
-                result['phones'] = self.remove_prefix(result['phones_government_buy'], 'Телефон(ы):')
+                result['phones'] = self.remove_prefix(result['phones'], 'Телефон(ы):')
 
-                # TODO cut by Телефон(ы)
             except Exception as E:
-                self.LOGGER.warning(f"Page does not contain goverment phone numbers")
+                self.LOGGER.warning(f"REGULAR phone numbers does not exists")
                 pass
 
         except Exception as E:
