@@ -26,18 +26,27 @@ def main():
     for i in range(1, 949):
         parse_urls.append(f'okved2/49.4/page/{i}')
 
-    # # Collections
+    # Collections
+    download_manager = ParserManager(
+        parse_urls=parse_urls,
+        output_file_path='dummy_path',
+        thread_count=6
+    )
+
+    download_manager.begin_downloads(
+        _type='collection',
+        _source='find_org'
+    )
     # download_manager = ParserManager(
     #     parse_urls=parse_urls,
     #     output_file_path='dummy_path',
     #     thread_count=6
     # )
-    #
+
     # download_manager.begin_downloads(
     #     _type='collection',
     #     _source='find_org'
     # )
-
     with open('find_org_collection_links', 'r') as file:
         pages_urls = file.readlines()
     pages_urls = [x.strip() for x in pages_urls]
@@ -55,7 +64,7 @@ def main():
     d_m = ParserManager(
         parse_urls=pages_urls,
         output_file_path='dummy_path',
-        thread_count=2
+        thread_count=4
     )
     d_m.begin_downloads(
         _type='page',
