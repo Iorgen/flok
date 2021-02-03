@@ -1,8 +1,6 @@
 from queue import Queue
 from parser.managers.parser import Parser
 from parser.parser.fabric import ChromeDriverParserFabric
-from config import Config
-cfg = Config()
 
 
 class ParserManager:
@@ -35,17 +33,14 @@ class ParserManager:
         # Create a thread pool and give them a queue
         CDF = ChromeDriverParserFabric()
         for i in range(self.thread_count):
-            parser = CDF.get_parser(
-                _source=_source,
-                _type=_type,
-                _driver_path='drivers/chromedriver'
-            )
-            parser._change_proxy()
             t = Parser(
                 queue=queue,
                 output_file_path=self.output_file_path,
-                parser=
-                # set_proxies if neeed
+                parser=CDF.get_parser(
+                    _source=_source,
+                    _type=_type,
+                    _driver_path='drivers/chromedriver'
+                )
             )
 
             if i == 0:
