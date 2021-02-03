@@ -75,16 +75,19 @@ class BaseChromeDriverParser(BaseParser):
         renew proxy web servers
 
     """
+    _PROXIES = []
     _DRIVER = None
     _CAPTCHA_RETRIES = 3
     _CAP_MONSTER_SOLVER_SLEEP_TIME = 2
 
-    def __init__(self, driver_path, *args, **kwargs):
+    def __init__(self, driver_path, captcha_key, *args, **kwargs):
         self._driver_path = driver_path
+        self._captcha_key = captcha_key
         _chrome_options = self._initialize_driver_options()
         self._initialize_driver(_driver_path=driver_path, _chrome_options=_chrome_options)
         super(BaseChromeDriverParser, self).__init__(*args, **kwargs)
-        self._change_proxy("37.9.46.222:8085")
+        BaseChromeDriverParser._set_next_proxy()
+        self._change_proxy()
 
     @staticmethod
     def _initialize_driver_options():
@@ -127,7 +130,7 @@ class BaseChromeDriverParser(BaseParser):
                 method='POST',
                 url='https://api.capmonster.cloud/getTaskResult',
                 json={
-                    "clientKey": "91588f4fb9475bde03fdfee20cd709ed",
+                    "clientKey": self._captcha_key,
                     "taskId": task_id
                 },
             ).json()
@@ -147,7 +150,7 @@ class BaseChromeDriverParser(BaseParser):
             method='POST',
             url='https://api.capmonster.cloud/createTask',
             json={
-                "clientKey": "91588f4fb9475bde03fdfee20cd709ed",
+                "clientKey": self._captcha_key,
                 "task":
                     {
                         "type": "ImageToTextTask",
@@ -171,12 +174,21 @@ class BaseChromeDriverParser(BaseParser):
     def _initialize_driver(self, _driver_path: str,  _chrome_options:  webdriver.ChromeOptions()):
         self._DRIVER = webdriver.Chrome(executable_path=_driver_path, chrome_options=_chrome_options)
 
-    def _change_proxy(self, _proxy_url: str):
+    @classmethod
+    def set_proxies(cls, proxies):
+        cls._PROXIES = proxies
+
+    @classmethod
+    def _set_next_proxy(cls):
+        cls._current_proxy = cls._PROXIES.pop()
+
+    def _change_proxy(self):
         """
         TODO check how this working
         :param _proxy_url:
         :return:
         """
+        _proxy_url = self._current_proxy
         _chrome_options = self._initialize_driver_options()
         _chrome_options.add_argument('--proxy-server=%s' % _proxy_url)
         self._initialize_driver(_driver_path=self._driver_path, _chrome_options=_chrome_options)

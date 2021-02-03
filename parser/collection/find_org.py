@@ -12,7 +12,7 @@ from parser.dumper import (
 
 
 class BaseFindOrgParser(BaseChromeDriverParser):
-
+    _ONE_PROXY_LIMIT = 40
     CAPTCHA_ENDPOINT = 'bot.html'
     # TODO cut down BASE_URL via __init__
 
@@ -44,6 +44,9 @@ class BaseFindOrgParser(BaseChromeDriverParser):
             # print(f" {self.BASE_URL}{_endpoint_url}")
         except WebDriverException as WDE:
             self._try_resolve_captcha()
+        # except TimeoutException as TE:
+        #     self.LOGGER
+        #     # TODO wait and and retry
         except Exception as e:
             # TODO wait N seconds
             self._try_resolve_captcha()
@@ -52,6 +55,9 @@ class BaseFindOrgParser(BaseChromeDriverParser):
 
     def _try_resolve_captcha(self):
         try:
+            # if BaseFindOrgParser.CAPTCHA_USAGE > self._ONE_PROXY_LIMIT:
+            #     self._change_proxy()
+            #     self._next_proxy()
             time.sleep(5)
             self._DRIVER.get(f"{self.BASE_URL}{self.CAPTCHA_ENDPOINT}")
             base64_captcha_image = self._try_to_find_captcha_block()
@@ -150,7 +156,13 @@ class FindOrgRetrieveCompanyUrlsByOkvedPageChromeParser(BaseFindOrgParser):
             else:
                 time.sleep(10)
                 self.retrieve_information(url=url)
-
+        except NoSuchElementException as NSEE:
+            self.LOGGER.warning(f" No element on page - {self.BASE_URL}{url} - start captcha resolving")
+            if self._MAIN_SOLVER_ID == threading.currentThread().getName():
+                self._try_resolve_captcha()
+            else:
+                time.sleep(10)
+                self.retrieve_information(url=url)
         except Exception as E:
             self.LOGGER.warning(f"- {self.BASE_URL}{url} - load error with {E}")
             if self._MAIN_SOLVER_ID == threading.currentThread().getName():
@@ -246,6 +258,7 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
             self._load_html_page(_endpoint_url=url)
             result = self._parse_page()
             # Better use database as storage for all links
+            result['url'] = url
             write_dict_information_into_csv(links=result, filename='find_org_company_information.csv')
             self.LOGGER.info(f"Page {self.BASE_URL}{url} parsed successfully")
             # JOB DONE

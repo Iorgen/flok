@@ -1,6 +1,8 @@
 from queue import Queue
 from parser.managers.parser import Parser
 from parser.parser.fabric import ChromeDriverParserFabric
+from config import Config
+cfg = Config()
 
 
 class ParserManager:
@@ -10,6 +12,7 @@ class ParserManager:
     MAIN_THREAD_NAME = None
 
     def __init__(self, parse_urls: list, output_file_path: str, thread_count: int =4):
+        # TODO write into csv header values
         self.thread_count = thread_count
         self.output_file_path = output_file_path
         self.parse_urls = parse_urls
@@ -46,7 +49,8 @@ class ParserManager:
                     _source=_source,
                     _type=_type,
                     _driver_path='drivers/chromedriver'
-                )
+                ).set_proxies(cfg.proxy_list)
+                # set_proxies if neeed
             )
 
             if i == 0:
