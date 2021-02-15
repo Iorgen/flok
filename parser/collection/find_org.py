@@ -67,6 +67,7 @@ class BaseFindOrgParser(BaseChromeDriverParser):
                     self._insert_captcha_and_submit_page(_captcha_key=captcha_key)
                     BaseFindOrgParser.CAPTCHA_USAGE = BaseFindOrgParser.CAPTCHA_USAGE + 1
                     self.LOGGER.info(f"Solved {BaseFindOrgParser.CAPTCHA_USAGE} captchas")
+                    print("captcha solved")
                     # Save img with captcha answer name to data folder in debug mode
                     # image = base64.b64decode(str(base64_captcha_image))
                     # with open("data/imageToSave.png", "wb") as fh:
@@ -189,6 +190,7 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
     def remove_prefix(s, prefix):
         return s[len(prefix):] if s.startswith(prefix) else s
 
+    # TODO Retry decorator
     def _parse_page(self):
         """
 
@@ -203,16 +205,31 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
             # 'main_okved_codes': [],
             # 'additional_okved_codes': []
         }
+        # Need to be sure we parse target page
+        title = self._DRIVER.find_element_by_xpath(
+            xpath=u"//body/div[1]/div[2]/div[1]/div[contains(@class, 'title')][1]"
+        ).text
+        self.LOGGER.info(f'Parsing {title}')
+        # body/div[1]/div[2]/div[1]/div[contains(@class, 'title')][1]
         try:
-            # GET Company status
-            result['status'] = self._DRIVER.find_element_by_xpath(
-                xpath=u"//i[contains(text(), 'Статус')]/following-sibling::span"
-            ).text
+            try:
+                # GET Company status
+                result['status'] = self._DRIVER.find_element_by_xpath(
+                    xpath=u"//i[contains(text(), 'Статус')]/following-sibling::span"
+                ).text
+            except Exception as E:
+                self.LOGGER.warning(f"Status name does not exists")
+                pass
 
-            # GET Company INN
-            result['INN'] = self._DRIVER.find_element_by_xpath(
-                xpath=u"//i[contains(text(), 'ИНН')]/following-sibling::a"
-            ).text
+            try:
+                # GET Company INN
+                result['INN'] = self._DRIVER.find_element_by_xpath(
+                    xpath=u"//i[contains(text(), 'ИНН')]/following-sibling::a"
+                ).text
+            except Exception as E:
+                self.LOGGER.warning(f"INN does not exists")
+                pass
+
             try:
                 # Get company manager personal information
                 result['manager'] = self._DRIVER.find_element_by_xpath(
@@ -220,6 +237,7 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
                 ).text
             except Exception as E:
                 self.LOGGER.warning(f"manager name does not exists")
+                pass
 
             try:
                 # Get Company phones by gov
