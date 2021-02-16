@@ -6,7 +6,7 @@ class Config:
     __slots__ = 'proxy_list', 'threads', 'path_driver', 'captcha_key'
 
     def __init__(self):
-        with open(config/proxy.txt ,'r') as proxy_file:
+        with open('config/proxy.txt' ,'r') as proxy_file:
             self.proxy_list = proxy_file
 
         self.threads = 6

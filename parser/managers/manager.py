@@ -39,7 +39,7 @@ class ParserManager:
                 parser=CDF.get_parser(
                     _source=_source,
                     _type=_type,
-                    _driver_path='drivers/chromedriver'
+                    _driver_path='drivers/driver'
                 )
             )
 

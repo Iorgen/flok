@@ -34,3 +34,16 @@ https://www.k-agent.ru/catalog/{INN}-{ORGN}
 - проверка на ИНН
 - проверка на КПП
 - коды ОКВЕД
+
+# 'name': '',
+# 'FIO': '',
+# 'INN': '',
+# 'KPP': '',
+# 'ORGN': '',
+# 'OKPO': '',
+# 'address': '',
+# 'phones': '',
+# 'okved': ''
+
+# 'main_okved_codes': [],
+# 'additional_okved_codes': []

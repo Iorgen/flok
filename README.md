@@ -42,3 +42,8 @@ create file with
 Create 
 find_org_collection_links
 find_org_company_information.csv
+
+
+# Usage instruction 
+Copy config.pt.dist to config/config.py
+extract for platform your driver and rename 

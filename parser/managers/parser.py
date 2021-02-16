@@ -1,10 +1,14 @@
-import os
-from threading import Thread
-from queue import Queue
 import binascii
+import csv
 import logging
+import os
+import threading
+from queue import Queue
+from threading import Thread
+
 from parser.base import BaseParser
-from parser.dumper import write_links_to_file
+
+global_lock = threading.Lock()
 
 
 class Parser(Thread):
@@ -32,10 +36,17 @@ class Parser(Thread):
     def run(self):
         while True:
             url = self.queue.get()
-            self.parser.retrieve_information(url)
-            # TODO i can put url here is catch some error from parser
+            result = self.parser.retrieve_information(url)
+            self.csv_writer(output_file_path=self.output_file_path, row=result)
             self.queue.task_done()
             if self.queue.empty():
                 self.parser._DRIVER.close()
 
         # TODO Solve task with driver closing when Thread finish his job
+    @staticmethod
+    def csv_writer(output_file_path: str, row: dict):
+        with global_lock:
+            with open(output_file_path, 'a', newline='') as csvfile:
+                writer = csv.writer(csvfile, delimiter=';',
+                                        quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                writer.writerow(row.values())

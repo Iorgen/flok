@@ -1,16 +1,15 @@
-from datetime import datetime, timedelta
+import logging
+import time
+
+import dateparser
+import requests
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
-import time
-import json
-import base64
-import pytesseract
-import os
-import requests
-import dateparser
-import asyncio
-from parser.exceptions import LoadPageException
-import logging
+from selenium.common.exceptions import WebDriverException
+
+from parser.exceptions import (
+    LoadPageException
+)
 
 
 class BaseParser:
@@ -20,7 +19,6 @@ class BaseParser:
     Queue based
     Or direct task based
     Depends on implementation
-
     """
     DATE_VALIDATORS = None
     PHONE_VALIDATORS = None
@@ -50,8 +48,6 @@ class BaseParser:
     def retrieve_information(self, url):
         raise NotImplementedError()
 
-    # TODO
-    # In base abstract class should be methods
     def date_parser(self, str):
         date = ''
         for validator in self.DATE_VALIDATORS:
@@ -78,17 +74,22 @@ class BaseChromeDriverParser(BaseParser):
     _DRIVER = None
     _CAPTCHA_RETRIES = 3
     _CAP_MONSTER_SOLVER_SLEEP_TIME = 2
+    _ONE_PROXY_LIMIT = 40
 
     def __init__(self, driver_path, captcha_key, *args, **kwargs):
         self._driver_path = driver_path
         self._captcha_key = captcha_key
         _chrome_options = self._initialize_driver_options()
+
         self._initialize_driver(_driver_path=driver_path, _chrome_options=_chrome_options)
         super(BaseChromeDriverParser, self).__init__(*args, **kwargs)
-        self._change_proxy("83.97.119.247:8085")
+        # Initial proxy setup
+        # TODO as POP from list
+        # self._change_proxy("5.133.122.207:8085")
 
     @staticmethod
     def _initialize_driver_options():
+        # TODO read some papers for selenium optimization
         # prefs = {"profile.managed_default_content_settings.images": 2}
         chrome_options = webdriver.ChromeOptions()
         # if not debug:
@@ -102,7 +103,6 @@ class BaseChromeDriverParser(BaseParser):
         chrome_options.add_argument('start-maximized')
         chrome_options.add_argument('disable-infobars')
         chrome_options.add_argument("--disable-extensions")
-        # chrome_options.add_experimental_option("prefs", prefs)
         return chrome_options
 
     def _try_find_element_text_by_xpath(self, x_path: str):
@@ -115,10 +115,9 @@ class BaseChromeDriverParser(BaseParser):
             self.LOGGER.warning(f"element by {x_path} does not exists because {E}")
             return ' '
 
-    def _cap_monster_solver(self, image_base64):
+    def _cap_monster_base64_image_solver(self, image_base64):
         """
-        # TODO get from enviroment variables
-
+        # TODO get from config
         :param image_base64:
         :return:
         """
@@ -185,48 +184,63 @@ class BaseChromeDriverParser(BaseParser):
 
     def _load_html_page(self, _endpoint_url):
         """
-        load page by url into self.DRIVER
-        :param _page_url:
-        :return:
+        PREDICATE
+        Default for loading html page via selenium browser
+        :param _endpoint_url:
+            template {self.BASE_URL}{_endpoint_url}
+            target page for information retrieving
         """
         try:
             self._DRIVER.get(f"{self.BASE_URL}{_endpoint_url}")
+        except WebDriverException as WDE:
+            self._try_resolve_captcha()
         except Exception as e:
-            self.LOGGER.exception(f'Attempt to load page {self.BASE_URL}{_endpoint_url} fails with {e}')
+            self._try_resolve_captcha()
+            self.LOGGER.warning(f'Attempt to load page {self.BASE_URL}{_endpoint_url} fails with {e}')
             raise LoadPageException()
+
+    def _new_proxy_needed(self):
+        """
+        implement in target page type class
+        :return:
+        """
+
+        raise NotImplementedError()
 
     def _parse_page(self):
         """
         XPATH docs - https://www.w3schools.com/xml/xpath_syntax.asp
         CSS Selectors - https://www.w3schools.com/cssref/css_selectors.asp
+        implement in target page type class
         :return:
         """
         raise NotImplementedError()
 
     def _try_resolve_captcha(self):
+        """
+        implement in target page type class using different
+        methods from base class
+        """
         raise NotImplementedError()
 
     def _is_current_page_captcha(self):
+        """
+        implement in target page type class
+        :return:
+        """
         raise NotImplementedError()
 
     def _find_captcha_block(self):
+        """
+        implement in target page type class
+        :return:
+        """
         raise NotImplementedError()
 
-# class BaseChromeCollectionParser(BaseChromeDriverParser):
-#     """
-#         Using chrome parser this class abstarct loading collection of target pages
-#         - retrieve from entrypoint url all pages urls
-#         - load next page
-#         - repeat until condition happens
-#     """
-#
-#     def __init__(self, **kwargs):
-#         super(BaseChromeDriverParser, self).__init__(**kwargs)
-#
-#     def preload_page(self, _entrypoint_url_addtition):
-#         entry_point_url = f'{self.BASE_URL}/{_entrypoint_url_addtition}'
-#         self._load_html_page(entry_point_url)
-#
-#     def loop_collection(self):
-#         raise NotImplementedError()
-
+    def _insert_captcha_and_submit_page(self, _captcha_key: str):
+        """
+        implement in target page type class
+        :param _captcha_key: captcha response key
+        :return:
+        """
+        raise NotImplementedError()
