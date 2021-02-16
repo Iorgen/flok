@@ -85,7 +85,7 @@ class BaseChromeDriverParser(BaseParser):
         super(BaseChromeDriverParser, self).__init__(*args, **kwargs)
         # Initial proxy setup
         # TODO as POP from list
-        # self._change_proxy("5.133.122.207:8085")
+        self._change_proxy("5.133.122.207:8085")
 
     @staticmethod
     def _initialize_driver_options():

@@ -21,8 +21,10 @@ def parse_k_agent_target_page():
                 except KeyError:
                     data[header] = [value]
 
-    for _inn in data['inn']:
-        links.append(f"{_inn}-1")
+    for _i in range(len(data['inn'])):
+        links.append(f"{data['inn'][_i]}-{data['ogrn'][_i]}")
+    # for _row in len(data['inn']:
+    #     links.append()
 
     print("LINKS READY")
 
