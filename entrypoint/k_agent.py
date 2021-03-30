@@ -6,6 +6,7 @@ logger = logging.getLogger("K-agent Parser")
 
 
 def parse_k_agent_target_page():
+    # restart from
     cfg = Config()
     print("K AGENT ")
     links = []
