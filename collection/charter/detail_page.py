@@ -28,6 +28,7 @@ class CharterChromeBasedPageParser(BaseCharter):
             'PROFILE': ' ',
             'OKVED': ' ',
             'ACTIVITY': ' ',
+            'TITLE': '',
 
             'ADDRESS': ' ',
             'NAME': ' ',
@@ -41,12 +42,13 @@ class CharterChromeBasedPageParser(BaseCharter):
             'KPP': ' ',
         }
         """
-
+        
         :return:
         """
         try:
-
             try:
+                # TODO check how get text from ::after
+
                 result['ACTIVITY'] = self._DRIVER.find_element_by_xpath(
                     xpath=u"//p[contains(text(), 'Деятельность')]"
                 ).text
@@ -63,8 +65,16 @@ class CharterChromeBasedPageParser(BaseCharter):
                 pass
 
             try:
-                result['PROFILE'] = self._DRIVER.find_element_by_xpath(
+                result['OKVED'] = self._DRIVER.find_element_by_xpath(
                     xpath=u"//dt[contains(text(), 'ОКВЭД')]/following-sibling::dd"
+                ).text
+            except Exception as E:
+                self.LOGGER.warning(f"Status name does not exists")
+                pass
+
+            try:
+                result['TITLE'] = self._DRIVER.find_element_by_xpath(
+                    xpath=u"//body/section[1]/div[1]/div[1]/div[1]/h1"
                 ).text
             except Exception as E:
                 self.LOGGER.warning(f"Status name does not exists")
