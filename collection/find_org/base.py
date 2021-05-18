@@ -15,7 +15,6 @@ class BaseFindOrgParser(BaseChromeDriverParser):
     _CAP_MONSTER_SOLVER_SLEEP_TIME = 2
     _ONE_PROXY_LIMIT = 40
     CAPTCHA_ENDPOINT = 'bot.html'
-    CAPTCHA_USAGE = 0
     """
         # Description for Find Org
         Using chrome based parser this class abstract retrieving information from
@@ -29,9 +28,7 @@ class BaseFindOrgParser(BaseChromeDriverParser):
     def _try_resolve_captcha(self):
         try:
             # TODO setup maximum delay for captcha
-            # if BaseFindOrgParser.CAPTCHA_USAGE > self._ONE_PROXY_LIMIT:
-            #     self._change_proxy()
-            #     self._next_proxy()
+
             time.sleep(5)
             self._DRIVER.get(f"{self.BASE_URL}{self.CAPTCHA_ENDPOINT}")
             base64_captcha_image = self._try_to_find_captcha_block()

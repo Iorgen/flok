@@ -1,6 +1,6 @@
 import logging
 import time
-
+import threading
 import dateparser
 import requests
 from selenium import webdriver
@@ -75,17 +75,79 @@ class BaseChromeDriverParser(BaseParser):
     _CAPTCHA_RETRIES = 3
     _CAP_MONSTER_SOLVER_SLEEP_TIME = 2
     _ONE_PROXY_LIMIT = 40
+    _PAGES_LOAD = 0
+    CAPTCHA_USAGE = 0
 
     def __init__(self, driver_path, captcha_key, *args, **kwargs):
         self._driver_path = driver_path
         self._captcha_key = captcha_key
         _chrome_options = self._initialize_driver_options()
-
         self._initialize_driver(_driver_path=driver_path, _chrome_options=_chrome_options)
         super(BaseChromeDriverParser, self).__init__(*args, **kwargs)
         # Initial proxy setup
         # TODO as POP from list
-        self._change_proxy("5.133.122.207:8085")
+        # self._change_proxy("5.133.122.207:8085")
+
+    @classmethod
+    def increment_loaded_pages(cls):
+        cls._PAGES_LOAD += 1
+
+    @classmethod
+    def change_proxy_necessary(cls):
+        necessary = False
+        if cls._PAGES_LOAD >= cls._ONE_PROXY_LIMIT:
+            necessary = True
+        if cls._CAPTCHA_RETRIES > cls.CAPTCHA_USAGE:
+            necessary = True
+        return necessary
+
+    class Retry(object):
+        """
+        A decorator inner class for retry functionality.
+        Set the custom retry_count and retry_interval in
+        outer class constructor
+        """
+
+        def __init__(self):
+            pass
+
+        def __call__(self, decor_method):
+            def wrapper(self, *args, **kwargs):
+                """
+                decorator func
+                """
+                return_values = None
+                for count in range(self._retry_count):
+                    try:
+                        result = decor_method(self, *args, **kwargs)
+                        return result
+
+                    except Exception as E:
+                        BaseChromeDriverParser.increment_loaded_pages()
+                        if BaseChromeDriverParser.change_proxy_necessary():
+                            # TODO get next proxy IP address
+                            self._change_proxy("5.133.122.207:8085")
+                        if self._MAIN_SOLVER_ID == threading.currentThread().getName():
+                            self._try_resolve_captcha()
+                        else:
+                            time.sleep(10)
+                        self._retrieve_information_exception_handler(exc=E, endpoint=kwargs.get('url', None))
+            return wrapper
+
+        def __set__(self):
+            return NotImplementedError("Cannot change value")
+
+    @staticmethod
+    def retry_check(name: str, curr_count: int, retry_count: int, err):
+        """
+        :param name:
+        :param curr_count:
+        :param retry_count:
+        :return:
+        """
+        # log something {name}
+        if curr_count == retry_count - 1:
+            raise err()
 
     @staticmethod
     def _initialize_driver_options():
@@ -177,6 +239,7 @@ class BaseChromeDriverParser(BaseParser):
         :param _proxy_url:
         :return:
         """
+        #
         _chrome_options = self._initialize_driver_options()
         _chrome_options.add_argument('--proxy-server=%s' % _proxy_url)
         self._initialize_driver(_driver_path=self._driver_path, _chrome_options=_chrome_options)
@@ -192,19 +255,23 @@ class BaseChromeDriverParser(BaseParser):
         """
         try:
             self._DRIVER.get(f"{self.BASE_URL}{_endpoint_url}")
-        except WebDriverException as WDE:
-            self._try_resolve_captcha()
-        except Exception as e:
-            self._try_resolve_captcha()
-            self.LOGGER.warning(f'Attempt to load page {self.BASE_URL}{_endpoint_url} fails with {e}')
+        except Exception as E:
             raise LoadPageException()
+
+    @Retry()
+    def retrieve_information(self, url):
+        """
+            :return:
+        """
+        self._load_html_page(_endpoint_url=url)
+        result = self._parse_page()
+        return result
 
     def _new_proxy_needed(self):
         """
         implement in target page type class
         :return:
         """
-
         raise NotImplementedError()
 
     def _parse_page(self):
@@ -241,6 +308,13 @@ class BaseChromeDriverParser(BaseParser):
         """
         implement in target page type class
         :param _captcha_key: captcha response key
+        :return:
+        """
+        raise NotImplementedError()
+
+    def _retrieve_information_exception_handler(self, exc: Exception, endpoint: str):
+        """
+        implement in target page type class
         :return:
         """
         raise NotImplementedError()

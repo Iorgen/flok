@@ -23,19 +23,9 @@ def parse_k_agent_target_page():
 
     for _i in range(len(data['inn'])):
         links.append(f"{data['inn'][_i]}-{data['ogrn'][_i]}")
-    # for _row in len(data['inn']:
-    #     links.append()
 
     print("LINKS READY")
-
-    d_m = ParserManager(
-        parse_urls=links,
-        output_file_path='data/k_agent_results.csv',
-        thread_count=cfg.threads
-    )
-
-    d_m.begin_downloads(
-        _type='page',
-        _source='k_agent'
-    )
     print('DONE -----------------------------------')
+
+# link creator with unified interface
+#

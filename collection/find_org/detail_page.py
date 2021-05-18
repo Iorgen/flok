@@ -96,34 +96,25 @@ class FindOrgRetrieveInformationFromPageChromeParser(BaseFindOrgParser):
 
         return result
 
-    def retrieve_information(self, url):
-        """
-        # TODO retry page amount
-        :return:
-        """
-        try:
-            # JOB START
-            self._load_html_page(_endpoint_url=url)
-            result = self._parse_page()
-            result['url'] = url
-            self.LOGGER.info(f"Page {self.BASE_URL}{url} parsed successfully")
-            return result
-            # JOB DONE
-
-        except (LoadPageException, ResolveCaptchaException, RetrieveInformationFromPageException) as INTER_E:
-            self.LOGGER.warning(f"Page {self.BASE_URL}{url} loading error with {INTER_E}")
-            if self._MAIN_SOLVER_ID == threading.currentThread().getName():
-                self._try_resolve_captcha()
-            else:
-                time.sleep(10)
-                self.retrieve_information(url=url)
-
-        except Exception as E:
-            self.LOGGER.warning(f"Page {self.BASE_URL}{url} loading error with {E}")
-            if self._MAIN_SOLVER_ID == threading.currentThread().getName():
-                self._try_resolve_captcha()
-            else:
-                time.sleep(10)
-                self.retrieve_information(url=url)
-        finally:
-            pass
+    # def retrieve_information(self, url):
+    #     """
+    #     # TODO retry page amount
+    #     :return:
+    #     """
+    #     try:
+    #         # JOB START
+    #         self._load_html_page(_endpoint_url=url)
+    #         result = self._parse_page()
+    #         result['url'] = url
+    #         self.LOGGER.info(f"Page {self.BASE_URL}{url} parsed successfully")
+    #         return result
+    #
+    #     except Exception as E:
+    #         self.LOGGER.warning(f"Page {self.BASE_URL}{url} loading error with {E}")
+    #         if self._MAIN_SOLVER_ID == threading.currentThread().getName():
+    #             self._try_resolve_captcha()
+    #         else:
+    #             time.sleep(10)
+    #             self.retrieve_information(url=url)
+    #     finally:
+    #         pass

@@ -9,10 +9,17 @@ class ParserManager:
     PARSERS = []
     MAIN_THREAD_NAME = None
 
-    def __init__(self, parse_urls: list, output_file_path: str, thread_count: int =4):
+    def __init__(
+            self,
+            parse_urls: list,
+            output_file_path: str,
+            thread_count: int = 4,
+            dump_func=None
+    ):
         # TODO write into csv header values
         self.thread_count = thread_count
         self.output_file_path = output_file_path
+        self._dump_func = dump_func
         self.parse_urls = parse_urls
 
     def begin_downloads(self, _type: str, _source: str):
@@ -40,7 +47,8 @@ class ParserManager:
                     _source=_source,
                     _type=_type,
                     _driver_path='drivers/driver'
-                )
+                ),
+                dump_func=self._dump_func
             )
 
             if i == 0:
