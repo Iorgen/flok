@@ -22,7 +22,7 @@ class CharterChromeBasedPageParser(BaseCharter):
     """
     _retry_count = 3
 
-    @property
+    # @property
     def _parse_page(self):
         result = {
             'PROFILE': ' ',
@@ -47,16 +47,6 @@ class CharterChromeBasedPageParser(BaseCharter):
         """
         try:
             try:
-                # TODO check how get text from ::after
-
-                result['ACTIVITY'] = self._DRIVER.find_element_by_xpath(
-                    xpath=u"//p[contains(text(), 'Деятельность')]"
-                ).text
-            except Exception as E:
-                self.LOGGER.warning(f"Status name does not exists")
-                pass
-
-            try:
                 result['PROFILE'] = self._DRIVER.find_element_by_xpath(
                     xpath=u"//dt[contains(text(), 'Профиль')]/following-sibling::dd/a/span"
                 ).text
@@ -68,6 +58,17 @@ class CharterChromeBasedPageParser(BaseCharter):
                 result['OKVED'] = self._DRIVER.find_element_by_xpath(
                     xpath=u"//dt[contains(text(), 'ОКВЭД')]/following-sibling::dd"
                 ).text
+
+                result['OKVED'] = result['OKVED'].replace("\n", " ")
+            except Exception as E:
+                self.LOGGER.warning(f"Status name does not exists")
+                pass
+
+            try:
+                block = self._DRIVER.find_element_by_xpath(
+                    xpath=u"//body/div[1]"
+                )
+                result['ACTIVITY'] = block.text.split('\n')[-1]
             except Exception as E:
                 self.LOGGER.warning(f"Status name does not exists")
                 pass
@@ -152,6 +153,6 @@ class CharterChromeBasedPageParser(BaseCharter):
             except Exception as E:
                 self.LOGGER.warning(f"REGULAR phone numbers does not exists")
                 pass
+            return result
         except Exception as E:
             raise RetrieveInformationFromPageException()
-        return result

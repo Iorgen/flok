@@ -126,12 +126,14 @@ class BaseChromeDriverParser(BaseParser):
                         BaseChromeDriverParser.increment_loaded_pages()
                         if BaseChromeDriverParser.change_proxy_necessary():
                             # TODO get next proxy IP address
-                            self._change_proxy("5.133.122.207:8085")
+                            # self._change_proxy("5.133.122.207:8085")
+                            pass
                         if self._MAIN_SOLVER_ID == threading.currentThread().getName():
                             self._try_resolve_captcha()
                         else:
                             time.sleep(10)
                         self._retrieve_information_exception_handler(exc=E, endpoint=kwargs.get('url', None))
+                        BaseChromeDriverParser.retry_check(count, self._retry_count, E)
             return wrapper
 
         def __set__(self):
