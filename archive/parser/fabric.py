@@ -3,6 +3,7 @@ from collection.find_org.detail_page import FindOrgRetrieveInformationFromPageCh
 from collection.k_agent.detail_page import KAgentChromeBasedPageParser
 from collection.charter.collection import CharterRetrieveCompanyUrlsByPageChromeParser
 from collection.charter.detail_page import CharterChromeBasedPageParser
+from collection.a_ads.detail_page import AAdsChromeBasedDetailParser
 from parser.exceptions import NoParserByParamsException
 from config.config import Config
 cfg = Config()
@@ -41,6 +42,12 @@ class ChromeDriverParserFabric:
                 )
             if _source == "charter":
                 return CharterChromeBasedPageParser(
+                    captcha_key=cfg.cap_monster_auth_key,
+                    driver_path=_driver_path,
+                    base_url=' '
+                )
+            if _source == "a-ads":
+                return AAdsChromeBasedDetailParser(
                     captcha_key=cfg.cap_monster_auth_key,
                     driver_path=_driver_path,
                     base_url=' '

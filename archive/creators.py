@@ -48,3 +48,12 @@ class KAgentPagesLinksCreator:
 
         for _i in range(len(data['inn'])):
             links.append(f"{data['inn'][_i]}-{data['ogrn'][_i]}")
+
+
+class AadsPagesLinksCreator:
+    def create_links(self):
+        # TODO hardcode
+        links = []
+        for _i in range(10, 100):
+            links.append(f"https://a-ads.com/campaigns/{_i}")
+        return links

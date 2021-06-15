@@ -7,7 +7,7 @@ from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 from selenium.common.exceptions import WebDriverException
 
-from parser.exceptions import (
+from flok.parser.exceptions import (
     LoadPageException
 )
 
@@ -77,6 +77,7 @@ class BaseChromeDriverParser(BaseParser):
     _ONE_PROXY_LIMIT = 40
     _PAGES_LOAD = 0
     CAPTCHA_USAGE = 0
+    _USE_PROXY = False
 
     def __init__(self, driver_path, captcha_key, *args, **kwargs):
         self._driver_path = driver_path
@@ -124,7 +125,7 @@ class BaseChromeDriverParser(BaseParser):
 
                     except Exception as E:
                         BaseChromeDriverParser.increment_loaded_pages()
-                        if BaseChromeDriverParser.change_proxy_necessary():
+                        if BaseChromeDriverParser.change_proxy_necessary() and self._USE_PROXY:
                             # TODO get next proxy IP address
                             # self._change_proxy("5.133.122.207:8085")
                             pass

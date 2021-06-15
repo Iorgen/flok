@@ -2,7 +2,7 @@ from config.config import Config
 from parser.managers.manager import ParserManager
 from entrypoint.k_agent import parse_k_agent_target_page
 from preparation.links.fabric import LinkCreatorFabric
-from dumper.base import DumpFabric
+from flok.dumper.base import DumpFabric
 import argparse
 parser = argparse.ArgumentParser(description='Videos to images')
 parser.add_argument(
@@ -24,11 +24,14 @@ def main():
     """ Execute parser script for"""
     print("------------------------------------")
     dependencies = parser.parse_args()
+    # This can be a link iterator
+
     link_creator = LinkCreatorFabric.get_link_creator(
         _source=dependencies.source,
         _type=dependencies.type
     )
     links = link_creator.create_links()
+
     d_m = ParserManager(
         parse_urls=links,
         output_file_path=f'data/{dependencies.source}/charter_page_results.csv',
@@ -42,6 +45,7 @@ def main():
     )
 
 # my cap "91588f4fb9475bde03fdfee20cd709ed" -
+# --source=charter --type=page
 
 
 if __name__ == '__main__':

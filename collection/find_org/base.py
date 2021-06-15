@@ -2,8 +2,8 @@ import time
 
 from selenium.common.exceptions import WebDriverException
 
-from parser.base import BaseChromeDriverParser
-from parser.exceptions import (
+from flok.parser.base import BaseChromeDriverParser
+from flok.parser.exceptions import (
     ResolveCaptchaException
 )
 
