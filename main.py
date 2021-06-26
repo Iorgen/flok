@@ -3,6 +3,7 @@ from parser.managers.manager import ParserManager
 from entrypoint.k_agent import parse_k_agent_target_page
 from preparation.links.fabric import LinkCreatorFabric
 from flok.dumper.base import DumpFabric
+
 import argparse
 parser = argparse.ArgumentParser(description='Videos to images')
 parser.add_argument(

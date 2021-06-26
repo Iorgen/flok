@@ -10,7 +10,6 @@ cfg = Config()
 
 
 class ChromeDriverParserFabric:
-    # TODO as Singleton
     def get_parser(self, _source, _type, _driver_path):
         # TODO call super method from based class
         if _type == "collection":
@@ -51,7 +50,7 @@ class ChromeDriverParserFabric:
                 return AAdsChromeBasedDetailParser(
                     captcha_key=cfg.cap_monster_auth_key,
                     driver_path=_driver_path,
-                    base_url=' '
+                    base_url=''
                 )
             else:
                 raise NoParserByParamsException()

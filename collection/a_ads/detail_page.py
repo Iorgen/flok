@@ -1,6 +1,7 @@
 from flok.parser.exceptions import (
     LoadPageException, ResolveCaptchaException, RetrieveInformationFromPageException
 )
+from flok.parser.base import BaseChromeDriverParser
 
 
 class AAdsChromeBasedDetailParser(BaseChromeDriverParser):
@@ -30,7 +31,7 @@ class AAdsChromeBasedDetailParser(BaseChromeDriverParser):
             'traffic': ' '
         }
         """
-        
+
         :return:
         """
         try:

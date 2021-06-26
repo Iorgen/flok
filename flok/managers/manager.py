@@ -52,27 +52,19 @@ class ParserManager:
 
     def begin_downloads(
             self,
-            parser_class,
-            captcha_key,
-            driver_path,
-            base_url
+            parser_creator,
     ):
         """
         Start the downloader threads, fill the queue with the URLs and\n
         then feed the threads URLs via the queue
         """
-
         queue = Queue()
 
         # TODO accept as parsing params dict and pass by key and value
         # Create a thread pool and give them a queue
         for i in range(self.thread_count):
             # Create new parser object
-            parser = parser_class(
-                captcha_key,
-                driver_path,
-                base_url
-            )
+            parser = parser_creator()
             t = Extractor(
                 queue=queue,
                 parser=parser,
@@ -97,5 +89,6 @@ class ParserManager:
         #     _parser._DRIVER.stop_client()
         #     _parser._DRIVER.close()
 
-# pass fabric class object which inerhits from base fabric class
+
+# pass fabric class object which inherits from base fabric class
 # Calling method get_parser
