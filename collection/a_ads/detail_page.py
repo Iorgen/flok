@@ -112,7 +112,8 @@ class AAdsChromeBasedDetailParser(BaseChromeDriverParser):
                 traffic = self._DRIVER.find_element_by_xpath(
                     "//p[contains(text(), 'Traffic sources:')]/following-sibling::ul"
                 )
-                result['traffic'] = traffic.text
+
+                result['traffic'] = traffic.text.replace('\n', ' ')
             except Exception as E:
                 self.LOGGER.warning(f"non exist")
                 pass

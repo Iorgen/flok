@@ -21,7 +21,7 @@ def create_links(_range: int):
 def n_create_links():
     # TODO hardcode
     links = []
-    for _i in range(10, 100):
+    for _i in range(10, 129170):
         links.append(f"https://a-ads.com/campaigns/{_i}")
     return links
 
